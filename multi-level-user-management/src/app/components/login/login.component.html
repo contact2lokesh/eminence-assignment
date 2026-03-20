@@ -4,24 +4,26 @@
       <div class="card shadow-lg">
         <div class="card-body p-4">
           <h2 class="text-center mb-4 text-primary fw-bold">Login</h2>
-          
-          <div *ngIf="errorMessage" class="alert alert-danger">
-            {{ errorMessage }}
-          </div>
+
+          @if (errorMessage) {
+            <div class="alert alert-danger">
+              {{ errorMessage }}
+            </div>
+          }
 
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <div class="mb-3">
               <label class="form-label">Username</label>
-              <input type="text" class="form-control form-control-lg" 
-                formControlName="username" placeholder="Enter username" 
+              <input type="text" class="form-control form-control-lg"
+                formControlName="username" placeholder="Enter username"
                 [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
               <div class="invalid-feedback">Username is required.</div>
             </div>
 
             <div class="mb-3">
               <label class="form-label">Password</label>
-              <input type="password" class="form-control form-control-lg" 
-                formControlName="password" placeholder="Enter password" 
+              <input type="password" class="form-control form-control-lg"
+                formControlName="password" placeholder="Enter password"
                 [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
               <div class="invalid-feedback">Password is required.</div>
             </div>
@@ -34,7 +36,7 @@
                   <i class="bi bi-arrow-clockwise"></i> Refresh
                 </button>
               </div>
-              <input type="text" class="form-control" formControlName="captchaText" placeholder="Enter CAPTCHA text" 
+              <input type="text" class="form-control" formControlName="captchaText" placeholder="Enter CAPTCHA text"
                 [class.is-invalid]="loginForm.get('captchaText')?.invalid && loginForm.get('captchaText')?.touched">
               <div class="invalid-feedback">CAPTCHA is required.</div>
             </div>
