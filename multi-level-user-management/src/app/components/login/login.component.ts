@@ -5,11 +5,10 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AuthService } from '../../services/auth';
 
 @Component({
-  selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+    selector: 'app-login',
+    imports: [CommonModule, ReactiveFormsModule],
+    templateUrl: './login.component.html',
+    styleUrl: './login.component.css'
 })
 export class LoginComponent implements OnInit {
     loginForm: FormGroup;
