@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { AuthService } from '../../../services/auth';
+import { AuthService } from '../../services/auth';
 
 @Component({
     selector: 'app-login',
@@ -16,7 +16,7 @@ export class LoginComponent implements OnInit {
     captchaSessionId: string = '';
     errorMessage: string = '';
 
-    constructor(   
+    constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private sanitizer: DomSanitizer){
@@ -46,7 +46,7 @@ export class LoginComponent implements OnInit {
         ...this.loginForm.value,
         captchaSessionId: this.captchaSessionId
       };
-      
+
       this.authService.login(payload).subscribe({
         next: () => {},
         error: (err) => {

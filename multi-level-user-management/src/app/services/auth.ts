@@ -13,11 +13,11 @@ export class AuthService {
   }
 
   getCaptcha(): Observable<any> {
-    return this.http.get('/api/auth/captcha');
+    return this.http.get('/api/auth/captcha', { withCredentials: true });
   }
 
   login(credentials: any): Observable<any> {
-    return this.http.post('/api/auth/login', credentials).pipe(
+    return this.http.post('/api/auth/login', credentials, { withCredentials: true }).pipe(
       tap((res: any) => {
         this.currentUser.set({ username: res.username, role: res.role, level: res.level });
         this.isAuthenticated.set(true);
@@ -27,7 +27,7 @@ export class AuthService {
   }
 
   logout(): void {
-    this.http.post('/api/auth/logout', {}).subscribe(() => {
+    this.http.post('/api/auth/logout', {}, { withCredentials: true }).subscribe(() => {
       this.currentUser.set(null);
       this.isAuthenticated.set(false);
       this.router.navigate(['/login']);
@@ -35,7 +35,7 @@ export class AuthService {
   }
 
   checkAuthStatus(): Observable<any> {
-    return this.http.get('/api/users/me').pipe(
+    return this.http.get('/api/users/me', { withCredentials: true }).pipe(
       tap((user: any) => {
         this.currentUser.set(user);
         this.isAuthenticated.set(true);

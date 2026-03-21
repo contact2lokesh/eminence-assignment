@@ -1,6 +1,7 @@
 import svgCaptcha from 'svg-captcha';
 import { Request, Response } from 'express';
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import User from "../models/User";
 
 const captchaStore = new Map<string, { text: string; expiresAt: number }>();
@@ -73,25 +74,55 @@ export const login = (req: Request, res: Response) => {
     const { username, password, captchaSessionId, captchaText } = req.body;
     
     console.log({username, password, captchaSessionId, captchaText});
-    // Verify CAPTCHA
+    // Verify CAPTCHA //
     const captchaData = captchaStore.get(captchaSessionId);
     if (!captchaData || captchaData.expiresAt < Date.now() || captchaData.text.toLowerCase() !== captchaText.toLowerCase()) {
         captchaStore.delete(captchaSessionId);
         return res.status(400).json({ message: 'Invalid or expired CAPTCHA' });
     }
     
-    // Stub login - replace with real auth
+    // Delete Captcha //
     captchaStore.delete(captchaSessionId);
-    if (username === 'admin' && password === 'password') {
-        res.json({ 
-            username, 
-            role: 'admin', 
-            level: 1,
-            token: 'stub-jwt-token' 
+    
+    User.findOne({ username })
+        .then(user => {
+            if (!user) {
+                return res.status(401).json({ message: 'Invalid credentials' });
+            }
+            
+            bcrypt.compare(password, user.passwordHash)
+                .then(isMatch => {
+                    if (!isMatch) {
+                        return res.status(401).json({ message: 'Invalid credentials' });
+                    }
+                    
+                    const token = jwt.sign(
+                        { userId: user._id, username: user.username, role: user.role, level: user.level }, 
+                        process.env.JWT_SECRET || 'eminenceInnovation', 
+                        { expiresIn: '1d' }
+                    );
+                    
+                    res.cookie('auth_token', token, {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: 'lax',
+                        maxAge: 24 * 60 * 60 * 1000 // 1 day
+                    });
+                    
+                    res.json({ 
+                        username: user.username, 
+                        role: user.role, 
+                        level: user.level,
+                        token 
+                    });
+                })
+                .catch(err => {
+                    res.status(500).json({ message: 'Error checking password', error: err.message });
+                });
+        })
+        .catch(err => {
+            res.status(500).json({ message: 'Server error', error: err.message });
         });
-    } else {
-        res.status(401).json({ message: 'Invalid credentials' });
-    }
 };
 
 export const logout = (req: Request, res: Response) => {
