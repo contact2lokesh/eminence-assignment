@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { AuthService } from '../../services/auth';
+import { AuthService } from '../../../services/auth';
 
 @Component({
     selector: 'app-login',
@@ -27,6 +27,7 @@ export class LoginComponent implements OnInit {
     });
     }
    ngOnInit(): void {
+     this.loadCaptcha();
   }
 
   loadCaptcha(): void {

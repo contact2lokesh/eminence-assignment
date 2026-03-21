@@ -1,0 +1,27 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/dashboard/home">MLM System</a>
+    
+    <div class="collapse navbar-collapse show">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/home" routerLinkActive="active">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/downline" routerLinkActive="active">My Downline</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/dashboard/transfer" routerLinkActive="active">Transfer</a>
+        </li>
+      </ul>
+      <div class="d-flex align-items-center text-white">
+        <span class="me-3"><i class="bi bi-person-circle"></i> {{ user?.name || user?.username }} ({{ user?.role }})</span>
+        <button class="btn btn-light btn-sm fw-bold text-primary" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <router-outlet></router-outlet>
+</div>
