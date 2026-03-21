@@ -1,0 +1,163 @@
+<div class="row">
+
+  <!-- Create Next-Level User -->
+  <div class="col-md-5 mb-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-bold">Create Next-Level User</h5>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="userForm" (ngSubmit)="onCreateUser()">
+          <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input type="text" class="form-control" formControlName="name" placeholder="Full Name" [class.is-invalid]="userForm.get('name')?.invalid && userForm.get('name')?.touched">
+            <div class="invalid-feedback">Name is required.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" class="form-control" formControlName="username" placeholder="New username" [class.is-invalid]="userForm.get('username')?.invalid && userForm.get('username')?.touched">
+            <div class="invalid-feedback">Username must be at least 6 chars and include letters and numbers.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" formControlName="password" placeholder="New password" [class.is-invalid]="userForm.get('password')?.invalid && userForm.get('password')?.touched">
+            <div class="invalid-feedback">Valid password (min 6 chars) is required.</div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100" [disabled]="userForm.invalid">Create User</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change Next-Level Password -->
+  <div class="col-md-7 mb-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-bold">Change Password (Next-Level Only)</h5>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="passwordForm" (ngSubmit)="onChangePassword()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Select User</label>
+              <select class="form-select" formControlName="userId" [class.is-invalid]="passwordForm.get('userId')?.invalid && passwordForm.get('userId')?.touched">
+                <option value="" disabled selected>Select user...</option>
+                <!-- Only show level + 1 -->
+                <ng-container *ngFor="let u of downlineUsers">
+                  <option *ngIf="u.level === user?.level + 1" [value]="u._id">{{ u.username }}</option>
+                </ng-container>
+              </select>
+              <div class="invalid-feedback">Please select a valid user.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">New Password</label>
+              <input type="password" class="form-control" formControlName="newPassword" placeholder="Enter new password" [class.is-invalid]="passwordForm.get('newPassword')?.invalid && passwordForm.get('newPassword')?.touched">
+              <div class="invalid-feedback">Valid password (min 6 chars) is required.</div>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-warning mt-3 float-end" [disabled]="passwordForm.invalid">Change Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Downline Viewer -->
+  <div class="col-12">
+    <div *ngIf="message" class="alert alert-{{message.type}}">
+      {{ message.text }}
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold">My Complete Downline Hierarchy</h5>
+        <button class="btn btn-sm btn-outline-secondary" (click)="loadDownline()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+      </div>
+      <div class="card-body p-0">
+        
+        <div *ngIf="loading" class="text-center p-4">
+          <div class="spinner-border text-primary" role="status"></div>
+        </div>
+
+        <div class="table-responsive" *ngIf="!loading && downlineUsers.length > 0">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Level</th>
+                <th>Balance</th>
+                <th>Role</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of downlineUsers">
+                <td>{{ u.name || 'N/A' }}</td>
+                <td class="fw-bold">{{ u.username }}
+                  <span *ngIf="u.level === user?.level + 1" class="badge bg-success ms-2">Direct</span>
+                </td>
+                <td>Level {{ u.level }}</td>
+                <td>${{ u.balance | number:'1.2-2' }}</td>
+                <td><span class="badge bg-secondary">{{ u.role }}</span></td>
+                <td>
+                  <button *ngIf="user?.role === 'OWNER'" class="btn btn-sm btn-outline-primary" (click)="viewAdminDownline(u._id)">
+                    View their downline
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div *ngIf="!loading && downlineUsers.length === 0" class="text-center p-5 text-muted">
+          <p>No downline users found. Start by creating your first downline user.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal/Section for Admin View Downline -->
+  <div class="col-12 mt-4" *ngIf="selectedUserIdToViewDownline && user?.role === 'OWNER'">
+    <div class="card shadow-sm border-info">
+      <div class="card-header bg-info text-white py-3 d-flex justify-content-between">
+        <h5 class="mb-0 fw-bold">Downline of User ID: {{ selectedUserIdToViewDownline }}</h5>
+        <button class="btn btn-sm btn-close btn-close-white" (click)="selectedUserIdToViewDownline = null"></button>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive" *ngIf="adminViewUsers.length > 0">
+          <table class="table table-striped mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Level</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of adminViewUsers">
+                <td>{{ u.name || 'N/A' }}</td>
+                <td>{{ u.username }}</td>
+                <td>Level {{ u.level }}</td>
+                <td>${{ u.balance | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="adminViewUsers.length === 0" class="text-center p-4">
+          <p>This user has no downline.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-confirm-modal
+    *ngIf="showConfirmModal"
+    [title]="confirmTitle"
+    [message]="confirmMessage"
+    [confirmButtonClass]="confirmButtonClass"
+    (confirm)="onModalConfirm()"
+    (cancel)="showConfirmModal = false">
+  </app-confirm-modal>
+
+</div>
