@@ -4,7 +4,7 @@ export interface ITransaction extends Document {
     senderId: mongoose.Types.ObjectId | null;
     receiverId: mongoose.Types.ObjectId;
     amount: number;
-    type: 'CREDIT' | 'SELF_RECHARGE';
+    type: 'CREDIT' | 'SELF_RECHARGE' | 'COMMISSION';
 }
 
 const transactionSchema = new Schema<ITransaction>({
@@ -25,7 +25,7 @@ const transactionSchema = new Schema<ITransaction>({
     },
     type: {
         type: String,
-        enum: ['CREDIT', 'SELF_RECHARGE'],
+        enum: ['CREDIT', 'SELF_RECHARGE', 'COMMISSION'],
         required: true
     }
 }, { timestamps: true });

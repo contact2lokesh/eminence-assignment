@@ -109,12 +109,15 @@ export const login = (req: Request, res: Response) => {
                         maxAge: 24 * 60 * 60 * 1000 // 1 day
                     });
                     
-                    res.json({ 
-                        username: user.username, 
+                    res.status(200).json({ 
+                        message: 'Logged in successfully', 
+                        _id: user._id, 
                         role: user.role, 
-                        level: user.level,
-                        token 
+                        level: user.level, 
+                        username: user.username, 
+                        name: user.name 
                     });
+
                 })
                 .catch(err => {
                     res.status(500).json({ message: 'Error checking password', error: err.message });

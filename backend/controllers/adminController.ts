@@ -88,7 +88,16 @@ export const globalCredit = async(req: AuthRequest, res: Response) => {
                 type: 'CREDIT'
             });
             await transaction.save();
+
+            const io = req.app.get('io');
             
+            if (io) {
+                io.to(parent._id.toString()).emit('balance_update', { balance: parent.balance });
+                io.to(receiver._id.toString()).emit('balance_update', { balance: receiver.balance });
+                io.to(receiver._id.toString()).emit('new_transaction'); 
+                io.to(parent._id.toString()).emit('new_transaction');
+            }
+
             res.status(200).json({ message: `Credit successful. Deducted from ${parent.username}.`, newBalance: receiver.balance });
         } catch (err) {
             throw err;

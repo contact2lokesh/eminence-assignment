@@ -1,10 +1,16 @@
 <div class="row">
   <div class="col-md-4 mb-4">
-    <div class="card text-white bg-success shadow">
+    <div class="card text-white bg-success shadow mb-3">
       <div class="card-body py-5 text-center">
         <h5 class="card-title text-uppercase fw-bold opacity-75">Current Balance</h5>
-        <h1 class="display-4 fw-bold">${{ balance | number:'1.2-2' }}</h1>
+        <h2 class="display-5 fw-bold">${{ balance | number:'1.2-2' }}</h2>
         <p class="mb-0" *ngIf="user?.role === 'OWNER'"><small>(Owner Account)</small></p>
+      </div>
+    </div>
+    <div class="card bg-warning shadow text-dark">
+      <div class="card-body py-4 text-center">
+        <h5 class="card-title text-uppercase fw-bold opacity-75">Commissions Earned</h5>
+        <h2 class="display-5 fw-bold">${{ totalCommission | number:'1.2-2' }}</h2>
       </div>
     </div>
   </div>
@@ -45,7 +51,8 @@
                   <span class="badge" [ngClass]="{
                     'bg-success': tx.type === 'CREDIT',
                     'bg-danger': tx.type === 'DEBIT',
-                    'bg-info text-dark': tx.type === 'SELF RECHARGE'
+                    'bg-info text-dark': tx.type === 'SELF RECHARGE',
+                    'bg-warning text-dark': tx.type === 'COMMISSION EARNED' || tx.type === 'COMMISSION PAID'
                   }">{{ tx.type }}</span>
                 </td>
                 <td>{{ tx.from }}</td>

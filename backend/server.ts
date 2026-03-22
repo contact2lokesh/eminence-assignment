@@ -1,15 +1,35 @@
 import dotenv from 'dotenv';
 dotenv.config();
-
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import { createServer } from 'node:http';
+import { Server } from 'socket.io';
+
+
+// routes //
 import authRoutes from './routes/authRoutes';
 import transferRoutes from "./routes/transferRoutes";
 import adminRoutes from "./routes/adminRoutes";
 
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, {
+   cors: {
+        origin: 'http://localhost:4200',
+        credentials: true
+    }
+});
+
+app.set('io', io);
+
+io.on('connection', (socket)=>{
+  socket.on('join', (userId: string)=>{
+    console.log(`Socket connection establist :- ${userId}`);
+    if(userId) socket.join(userId); 
+  });
+});
 
 app.use(cors({
     origin: 'http://localhost:4200',
@@ -54,7 +74,7 @@ app.use('/api/admin', adminRoutes);
 
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(process.env.NODE_ENV);
   console.log(`Server is running on  http://localhost:${PORT}`);
 });

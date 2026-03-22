@@ -76,20 +76,50 @@ export const transferBalance = async(req: AuthRequest, res: Response) => {
             return res.status(400).json({ message: 'Insufficient balance.' });
         }
 
-         try {
-            sender.balance -= Number(amount);
-            receiver.balance += Number(amount);
+        const owner = await User.findOne({ role: 'OWNER' });
+        if (!owner) {
+            return res.status(500).json({ message: 'Critical error: System OWNER not found.' });
+        }
 
+        const sendingAmount = Number(amount);
+        const commission = sendingAmount * 0.02; // 2% commsion fee //
+        const netAmount = sendingAmount - commission;
+
+         try {
+            sender.balance -= sendingAmount;
+            receiver.balance += (sendingAmount - commission);
+            
+            // The SENDER earns the 2% commission!
+            sender.balance += commission;
+
+            const commissionTx = new Transaction({
+                senderId: receiver._id,
+                receiverId: sender._id,
+                amount: commission,
+                type: 'COMMISSION'
+            });
+
+            await commissionTx.save();
             await sender.save();
             await receiver.save();
 
             const transaction = new Transaction({
                 senderId: sender._id,
                 receiverId: receiver._id,
-                amount: Number(amount),
+                amount: netAmount,
                 type: 'CREDIT'
             });
+            
             await transaction.save();
+            const io = req.app.get('io');
+
+            if(io) {
+                io.to(sender._id.toString()).emit('balance_update', { balance: sender.balance });
+                io.to(receiver._id.toString()).emit('balance_update', { balance: receiver.balance });
+                io.to(receiver._id.toString()).emit('new_transaction');
+                io.to(sender._id.toString()).emit('new_transaction');
+            }
+
             res.status(200).json({ message: 'Transfer successful', balance: sender.balance });
         } catch (err) {
             throw err;
@@ -114,10 +144,17 @@ export const getStatement = async(req:AuthRequest, res: Response) => {
             const trnsObj = trns as any;
             const isDebit = trnsObj.senderId && trnsObj.senderId._id.toString() === userId;
             const isSelfRecharge = trns.type === 'SELF_RECHARGE';
-            
+            const isCommission = trns.type === 'COMMISSION';
+
+            let displayType = isSelfRecharge ? 'SELF RECHARGE' : isDebit ? 'DEBIT' : 'CREDIT';
+
+            if(isCommission) {
+                displayType = trnsObj.receiverId._id.toString() === userId ? 'COMMISSION EARNED' : 'COMMISSION PAID';
+            }
+
             return {
                 id: trns._id,
-                type: isSelfRecharge ? 'SELF RECHARGE' : isDebit ? 'DEBIT' : 'CREDIT',
+                type: displayType,
                 amount: trns.amount,
                 timestamp: trnsObj.createdAt || trnsObj.timestamp,
                 from: isSelfRecharge ? 'System' : trnsObj.senderId ? trnsObj.senderId.username : 'System',

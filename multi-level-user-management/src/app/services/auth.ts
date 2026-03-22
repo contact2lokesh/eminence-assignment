@@ -19,7 +19,7 @@ export class AuthService {
   login(credentials: any): Observable<any> {
     return this.http.post('/api/auth/login', credentials, { withCredentials: true }).pipe(
       tap((res: any) => {
-        this.currentUser.set({ username: res.username, role: res.role, level: res.level });
+        this.currentUser.set({ id: res._id || res.id, name: res.name, username: res.username, role: res.role, level: res.level });
         this.isAuthenticated.set(true);
         this.router.navigate(['/dashboard/home']);
       })
