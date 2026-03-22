@@ -41,8 +41,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-const mongoURI = process.env.MONGODB_URI;
+let mongoURI = process.env.MONGODB_URI;
 if (mongoURI) {
+    const dbUser = process.env.DB_USERNAME || '';
+    const dbPass = process.env.DB_PASSWORD || '';
+    mongoURI = mongoURI.replace('<db_username>', dbUser).replace('<db_password>', encodeURIComponent(dbPass));
+    console.log(mongoURI);
     mongoose.connect(mongoURI)
         .then(() => console.log('MongoDB connected'))
         .catch(err => console.error('MongoDB connection error:', err));

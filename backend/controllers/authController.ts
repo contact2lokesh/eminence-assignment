@@ -74,8 +74,6 @@ export const registerOwner = async (req: Request, res: Response) => {
 
 export const login = (req: Request, res: Response) => {
     const { username, password, captchaSessionId, captchaText } = req.body;
-    
-    console.log({username, password, captchaSessionId, captchaText});
     // Verify CAPTCHA //
     const captchaData = captchaStore.get(captchaSessionId);
     if (!captchaData || captchaData.expiresAt < Date.now() || captchaData.text.toLowerCase() !== captchaText.toLowerCase()) {
