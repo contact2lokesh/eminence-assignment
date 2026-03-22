@@ -22,7 +22,9 @@ export const generateCaptcha = (req: Request, res: Response) => {
 
     res.status(200).json({
         sessionId,
-        captchaSvg: captcha.data
+        captchaSvg: captcha.data,
+        // added captcha textf for test Swagger
+        ...(process.env.NODE_ENV !== 'production' && { text_for_testing_only: captcha.text })
     });
 };
 

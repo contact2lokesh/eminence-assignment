@@ -6,7 +6,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
-
+import { setupSwagger } from './swagger';
 
 // routes //
 import authRoutes from './routes/authRoutes';
@@ -23,6 +23,7 @@ const io = new Server(httpServer, {
 });
 
 app.set('io', io);
+setupSwagger(app);
 
 io.on('connection', (socket)=>{
   socket.on('join', (userId: string)=>{
