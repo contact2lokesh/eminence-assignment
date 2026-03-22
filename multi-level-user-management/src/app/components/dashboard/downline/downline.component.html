@@ -100,7 +100,7 @@
                 <td>${{ u.balance | number:'1.2-2' }}</td>
                 <td><span class="badge bg-secondary">{{ u.role }}</span></td>
                 <td>
-                  <button *ngIf="user?.role === 'OWNER'" class="btn btn-sm btn-outline-primary" (click)="viewAdminDownline(u._id)">
+                  <button class="btn btn-sm btn-outline-primary" (click)="viewAdminDownline(u._id,u.username)">
                     View their downline
                   </button>
                 </td>
@@ -117,7 +117,7 @@
   </div>
 
   <!-- Modal/Section for Admin View Downline -->
-  <div class="col-12 mt-4" *ngIf="selectedUserIdToViewDownline && user?.role === 'OWNER'">
+  <div class="col-12 mt-4" *ngIf="selectedUserIdToViewDownline">
     <div class="card shadow-sm border-info">
       <div class="card-header bg-info text-white py-3 d-flex justify-content-between">
         <h5 class="mb-0 fw-bold">Downline of User ID: {{ selectedUserIdToViewDownline }}</h5>

@@ -120,8 +120,7 @@ export const  changeNextLevelPassword = async(req:AuthRequest, res:Response) => 
         // check the particular user assosiated with their parent user or not //
         if (childUser?.parentId?.toString() !== parentId) {
             return res.status(403).json({ 
-                message: 'You can only change the password of your direct downline.' 
-            });
+                message: 'You can only change the password of your direct downline.' });
         }
 
         const passwordHash = await bcrypt.hash(newPassword, 10);

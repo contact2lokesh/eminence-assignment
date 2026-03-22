@@ -1,0 +1,40 @@
+<div class="row">
+  <div class="col-12 mb-4">
+    <h2 class="fw-bold"><i class="bi bi-pie-chart-fill text-primary me-2"></i> System Summary</h2>
+    <p class="text-muted">Global overview of system balances and users.</p>
+  </div>
+</div>
+
+<div *ngIf="loading" class="text-center py-5">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div *ngIf="error" class="alert alert-danger">
+  {{ error }}
+</div>
+
+<div *ngIf="!loading && !error && summaryData" class="row g-4">
+  <!-- Total System Balance Card -->
+  <div class="col-md-6 col-lg-4">
+    <div class="card shadow-sm border-0 border-start border-primary border-4 h-100">
+      <div class="card-body">
+        <h6 class="text-muted text-uppercase mb-1">Total System Balance</h6>
+        <h3 class="fw-bold mb-0 text-primary">${{ summaryData.totalSystemBalance | number:'1.2-2' }}</h3>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6 col-lg-4" *ngFor="let role of summaryData.roleSummary">
+    <div class="card shadow-sm border-0 border-start border-4 h-100" [ngClass]="role._id === 'OWNER' ? 'border-warning' : 'border-success'">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h6 class="text-muted text-uppercase mb-1">{{ role._id }} Users</h6>
+          <span class="badge bg-secondary rounded-pill">{{ role.userCount }}</span>
+        </div>
+        <h4 class="fw-bold mb-0">${{ role.totalBalance | number:'1.2-2' }}</h4>
+      </div>
+    </div>
+  </div>
+</div>

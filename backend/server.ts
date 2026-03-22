@@ -6,6 +6,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import authRoutes from './routes/authRoutes';
+import transferRoutes from "./routes/transferRoutes";
+import adminRoutes from "./routes/adminRoutes";
 
 const app = express();
 
@@ -47,6 +49,9 @@ import userRoutes from './routes/userRoutes';
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/balance", transferRoutes);
+app.use('/api/admin', adminRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

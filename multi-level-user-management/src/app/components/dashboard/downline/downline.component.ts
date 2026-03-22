@@ -34,6 +34,7 @@ export class DownlineComponent implements OnInit {
   }
 
   ngOnInit(): void {
+      this.user = this.authService.currentUser();
       this.loadDownline();
   }
 
@@ -53,15 +54,13 @@ export class DownlineComponent implements OnInit {
       });
   }
 
-  viewAdminDownline(targetId: string): void {
-    if (this.user.role === 'OWNER') {
-      this.http.get<any[]>(`/api/admin/users/${targetId}/downline`).subscribe({
-        next: (users) => {
-          this.adminViewUsers = users;
-          this.selectedUserIdToViewDownline = targetId;
-        }
-      });
-    }
+  viewAdminDownline(targetId: string, username :string): void {
+    this.http.get<any[]>(`/api/admin/users/${targetId}/downline`).subscribe({
+      next: (users) => {
+        this.adminViewUsers = users;
+        this.selectedUserIdToViewDownline = ` ${username} (${targetId})`;
+      }
+    });
   }
 
   showConfirmModal = false;
